@@ -58,24 +58,69 @@ class Cab:
         pwd=input("pwd:")
         no=input("contact:")
         self.registerEmployee(fname,lname,usr,pwd,no)
+def check_credentials(self,usr_name,entered_password):
+                    insert_query1 = """
+                    Select "pwd" from "sensitive_info_g2" where "username"=%s;
+                    """
+                    cur.execute(insert_query1, (usr_name,))
+                    stored_password=cur.fetchone()[0].encode('utf-8')
+                    if stored_password:
+                        if bcrypt.checkpw(entered_password.encode('utf-8'), stored_password):
+                           return True
+                    
+                        return False  
+                    
+                    cur.close()
+                    conn.commit()
 
- 
+                    
+   
+    def DriverLogin(self,chance):
+            if chance<2:
+                usr_name=input("Enter your username:")
+                entered_password=input("Enter your password:")
+               
 
-    def DriverLogin(self):
-        input("Enter your username:")
-        input("Enter your password:")
+               
+                if self.check_credentials(usr_name,entered_password):
+                    print("Congratulations you logged in .......")
+                                
+                else:
+                    print("Password is incorrect!!! Try Again!!")
+                    chance=chance+1
+                    self.DriverLogin(chance)
+            else:
+                 print("!!!!!!! Too many wrong attempts !!!!!!!!")
 
- 
 
+
+
+    def registerDriver(self,fname,lname,usr,licence_no,driver_id,password,contact_no):
+
+        cur = conn.cursor()
+        sql1='''insert into drivers_g2(driver_id,f_name,l_name,licence_no) values (%s,%s,%s,%s)'''
+        cur.execute(sql1,(driver_id,fname,lname,licence_no))
+        conn.commit()
+        sql2='''insert into sensitive_info_g2(prole,username,pwd,contact_no) values (%s,%s,%s,%s)'''
+        cur.execute(sql2,('Driver',usr,password,contact_no))
+        conn.commit
+        date_now=datetime.now().isoformat(sep=" ")
+        sql3='''insert into public.log_g2(description, "timestamp") values (%s,%s)'''
+        cur.execute(sql3,(f'Driver named {fname} {lname} was registered',date_now))
+        cur.close()
+        conn.commit()
        
-
+        
     def NewDriver(self):
-        input("Enter your name:")
-        input("Enter your age:")
-        input("Enter your Gender:")
-        input("Enter your emailid:")
-        input("Enter your CarName:")
-
+            fname = input("Enter your first name:")
+            lname=input("Enter your last name:")
+            contact_no= input("Enter your Contact_Info:")
+            usr=input("Enter username:")
+            licence_no = input("Enter your Vehicle Information:")
+            driver_id = input("Enter  your Driver_Id:")
+            password1 = input("Create your password:")
+            password=self.encrypt_password(password1)
+            self.registerDriver(fname,lname,usr,licence_no,driver_id,password,contact_no)
 
        
 
